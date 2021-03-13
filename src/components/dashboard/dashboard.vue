@@ -6,7 +6,6 @@
       :per-page="perPage"
       prev-text="Prev"
       next-text="Next"
-      aria-controls="itemList"
       align="center"
       @change="handlePageChange"
     ></b-pagination>
@@ -33,20 +32,29 @@
     data () {
       return {
         newsData: null,
-        page:1
+        currentPage: 1,
+        rows:null,
+        perPage:1
       }
     },
     created () {
       this.fetchData()
     },
     methods:{
-      fetchData () {
-        axios.get('/news').
-        then(response =>this.newsData = response.data.results)
+      fetchData (page_number) {
+        var url = '/news'
+        if (page_number){
+          var url = `/news?page=${page_number}`
+        }
+        axios.get(url).
+        then((response) =>{
+          this.rows = parseInt(response.data.count/10)
+          this.newsData = response.data.results
+          })
       },
       handlePageChange(value){
-        this.page = value
-        console.log(this.page)
+        this.fetchData(value)
+
       }
     }
   }
